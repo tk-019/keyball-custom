@@ -1,0 +1,12 @@
+{
+  "keyboard_name": "Keyball39",
+  "manufacturer": "tk-019",
+  "usb": {
+    "vid": "0xFEED",
+    "pid": "0x0200",
+    "device_version": "1.0.0"
+  },
+  "processor": "atmega32u4",
+  "bootloader": "caterina",
+  "architecture": "avr"
+}
