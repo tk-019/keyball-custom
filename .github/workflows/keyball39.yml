@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        run: |
+          git clone ${{ github.event.repository.clone_url }} .
+          git fetch --all
 
       - name: Install dependencies
         run: |
@@ -28,9 +30,3 @@ jobs:
         run: |
           cd ~/qmk_firmware
           qmk compile -kb keyball/keyball39 -km default
-
-      - name: Upload firmware
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: keyball39-firmware
-          path: ~/qmk_firmware/.build/*.hex
