@@ -30,7 +30,7 @@ MOUSEKEY_ENABLE = no
 
 # Enabled only one of RGBLIGHT and RGB_MATRIX if necessary.
 RGBLIGHT_ENABLE = no        # Enable RGBLIGHT
-RGBLIGHT_DRIVER = WS2812
+RGBLIGHT_DRIVER = ws2812
 RGB_MATRIX_ENABLE = no      # Enable RGB_MATRIX (not work yet)
 # RGB_MATRIX_DRIVER = WS2812
 
