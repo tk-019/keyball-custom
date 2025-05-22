@@ -4,57 +4,31 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - 'keyball39/v[0-9]+.[0-9]+.[0-9]+*'
-  pull_request:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Setup QMK firmware
-        uses: ./.github/actions/setup-qmk
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip gcc-avr avr-libc dfu-programmer
+          pip3 install qmk
 
-      - name: Install a link to own source
-        run: ln -s $(pwd)/qmk_firmware/keyboards/keyball __qmk__/keyboards/keyball
+      - name: Setup QMK
+        run: |
+          qmk setup -y
+          ln -s $GITHUB_WORKSPACE/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/keyball
 
-      - run: qmk compile -j 4 -kb keyball/keyball39 -km default
+      - name: Compile firmware
+        run: qmk compile -kb keyball/keyball39 -km default
 
-      - run: qmk compile -j 4 -kb keyball/keyball39 -km test
-
-      - run: qmk compile -j 4 -kb keyball/keyball39 -km via
-
-      - name: Archive firmwares
+      - name: Upload firmware
         uses: actions/upload-artifact@v2
         with:
-          name: keyball39-firmwares
-          path: __qmk__/*.hex
-
-  release:
-    name: Release
-    runs-on: ubuntu-22.04
-    needs: [build]
-    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'keyball39/v')
-
-    steps:
-      - name: Download built firmwares
-        uses: actions/download-artifact@v3
-        with:
-          name: keyball39-firmwares
-      - name: List assets
-        run: ls -l *.hex
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          prerelease: ${{ contains(github.ref_name, '-alpha.') || contains(github.ref_name, '-beta.') }}
-          files: |
-            *.hex
-          fail_on_unmatched_files: true
-          generate_release_notes: true
-          append_body: true
+          name: keyball39-firmware
+          path: ~/qmk_firmware/.build/*.hex
