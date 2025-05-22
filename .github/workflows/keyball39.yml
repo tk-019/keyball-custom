@@ -1,4 +1,4 @@
-name: Keyball39 firmware
+name: Keyball39 firmware (no external actions)
 
 on:
   push:
@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        run: |
+          git clone ${{ github.event.repository.clone_url }} .
+          git fetch --all
 
       - name: Install dependencies
         run: |
@@ -25,10 +27,11 @@ jobs:
           ln -s $GITHUB_WORKSPACE/qmk_firmware/keyboards/keyball ~/qmk_firmware/keyboards/keyball
 
       - name: Compile firmware
-        run: qmk compile -kb keyball/keyball39 -km default
+        run: |
+          cd ~/qmk_firmware
+          qmk compile -kb keyball/keyball39 -km default
 
-      - name: Upload firmware
-        uses: actions/upload-artifact@v2
-        with:
-          name: keyball39-firmware
-          path: ~/qmk_firmware/.build/*.hex
+      - name: Archive firmware
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/artifacts
+          cp ~/qmk_firmware/.build/*.hex $GITHUB_WORKSPACE/artifacts/
